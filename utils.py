@@ -10,6 +10,26 @@ from tqdm.auto import tqdm
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #
+
+
+# def cos_dist(X,Y):
+#     X_norm = torch.norm(X, dim=1)
+#     Y_norm = torch.norm(Y, dim=1)
+#     cos_dist = 1- torch.mm(X_norm, torch.t(Y_norm))
+#     return cos_dist
+
+# def sinkhorn_dist(C, a,b, epsilon=1, max_iters=100):
+#     u = torch.ones_like(a).to(device)
+#     v = torch.ones_like(b).to(device)
+
+#     with torch.no_grad():
+#         K = torch.exp(-C/epsilon)
+#         for i in range(max_iters):
+#             u = a / (torch.matmul(K,v))
+#             v = b / (torch.matmul(K.T,u))
+#     M = torch.matmul(torch.diag(u), torch.matmul(K, torch.diag(v)))
+#     return M
+
 # TODO : move to model
 def weights_init(w):
     """
@@ -22,14 +42,6 @@ def weights_init(w):
         nn.init.normal_(w.weight.data, 1.0, 0.02)
         nn.init.constant_(w.bias.data, 0)
 
-
-# def cos_dist(X,Y):
-#     X_norm = torch.norm(X, dim=1)
-#     Y_norm = torch.norm(Y, dim=1)
-#     cos_dist = 1- torch.mm(X_norm, torch.t(Y_norm))
-#     return cos_dist
-
-
 def cos_dist(X, Y):
     C = torch.zeros((X.size(0), Y.size(0))).to(device)
     for i in range(X.size(0)):
@@ -37,20 +49,6 @@ def cos_dist(X, Y):
             C[i, j] = F.cosine_similarity(X[i], Y[j], dim=0)
     return C
 
-
-# def sinkhorn_dist(C, a,b, epsilon=1, max_iters=100):
-#     u = torch.ones_like(a).to(device)
-#     v = torch.ones_like(b).to(device)
-
-#     with torch.no_grad():
-#         K = torch.exp(-C/epsilon)
-#         for i in range(max_iters):
-#             u = a / (torch.matmul(K,v))
-#             v = b / (torch.matmul(K.T,u))
-
-#     M = torch.matmul(torch.diag(u), torch.matmul(K, torch.diag(v)))
-
-#     return M
 
 
 def M_C(C, u, v, eps=0.1):
