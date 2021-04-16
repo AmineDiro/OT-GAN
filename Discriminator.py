@@ -33,6 +33,7 @@ class Discriminator(nn.Module):
         )  
 
     def forward(self, x):
+        #TODO : add maxpool with relu
         batch_size = x.size()[0]
         x = self.conv1(x)
         x = self.relu(x)

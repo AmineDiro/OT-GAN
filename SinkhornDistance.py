@@ -1,8 +1,7 @@
-
-  
 import torch
 import torch.nn as nn
 
+# TODO 
 class SinkhornDistance(nn.Module):
     r"""
     Given two empirical measures each with :math:`P_1` locations
