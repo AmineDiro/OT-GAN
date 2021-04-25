@@ -9,7 +9,7 @@ from weight_norm import weight_norm
 
 # class Generator(nn.Module):
 #     """Generator architecture from Salimans et al (2018) [see appendix B]."""
-#     def __init__(self, input_size=100, kernel_size=5):
+#     def __init__(self,out_channels =3, input_size=100, kernel_size=5):
 #         super(Generator, self).__init__()
 
 #         self.linear = nn.Linear(input_size, 2*512*8*8)
@@ -19,7 +19,7 @@ from weight_norm import weight_norm
 
 #         self.conv1 = nn.Conv2d(512, 2*256, kernel_size, padding=conv_padding_size)
 #         self.conv2 = nn.Conv2d(256, 2*128, kernel_size, padding=conv_padding_size)
-#         self.conv3 = nn.Conv2d(128, 1, kernel_size, padding=conv_padding_size)
+#         self.conv3 = nn.Conv2d(128, out_channels, kernel_size, padding=conv_padding_size)
 
 #         self.activ_out = nn.Tanh()
 
@@ -49,44 +49,40 @@ class Generator(nn.Module):
     def __init__(self, input_dim=100, out_channels=3):
         super(Generator, self).__init__()
         self.input_dim = input_dim
-        self.linear = weight_norm(nn.Linear(in_features=input_dim, out_features=32768))
+        self.linear = nn.Linear(in_features=input_dim, out_features=32768)
         # need to define out features = 2*16384 because glu devides by 2 the number of units
-        self.conv1 = weight_norm(
-            nn.Conv2d(
+        self.conv1 = nn.Conv2d(
                 in_channels=2 * 512,
                 out_channels=2 * 512,
                 kernel_size=5,
                 padding=2,
                 stride=1,
             )
-        )
-        self.conv2 = weight_norm(
-            nn.Conv2d(
+        
+        self.conv2 = nn.Conv2d(
                 in_channels=2 * 256,
                 out_channels=2 * 256,
                 kernel_size=5,
                 padding=2,
                 stride=1,
             )
-        )
-        self.conv3 = weight_norm(
-            nn.Conv2d(
+        
+        self.conv3 = nn.Conv2d(
                 in_channels=2 * 128,
                 out_channels=2 * 128,
                 kernel_size=5,
                 padding=2,
                 stride=1,
             )
-        )
-        self.last_conv = weight_norm(
-            nn.Conv2d(
+        
+        self.last_conv = nn.Conv2d(
                 in_channels=128,
                 out_channels=out_channels,
                 kernel_size=5,
                 padding=2,
                 stride=1,
             )
-        )
+        
         self.activ_out = nn.Tanh()
     
     def generate_noise(self, batch_size):

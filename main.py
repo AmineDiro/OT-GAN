@@ -47,8 +47,6 @@ def main():
     #  Init device
     device = torch.device("cuda" if (use_cuda and torch.cuda.is_available()) else "cpu")
 
-    # dataloader = load_mnist()
-
     dataloader = load_mnist()
     # Create Generator
     gmodel = Generator(out_channels=1)
@@ -100,15 +98,15 @@ def main():
 
             loss, loss_generator, loss_critic = loss_func(X, Xprime, Y, Yprime)
 
-            loss.backward()
+            # loss.backward()
             # optimizer_G.step()
 
             if i + 1 % n_gen == 0:
                 # Update critic once every 3 generator updates
-                # loss.backward(mone)
+                loss.backward(mone)
                 optimizer_D.step()
             else:
-                # loss.backward()
+                loss.backward()
                 optimizer_G.step()
             
             # description tqdm
@@ -137,12 +135,15 @@ def main():
                 "model/model_mnist.pth",
             )
 
+        ## NOTE : Inception score : generate N batches of images and compute the inception score
+
         # if epoch % 1 == 0 or epoch + 1 == epochs:
         #     samples = sample_data(3, gmodel) * 0.5 + 0.5
         #     for img in samples:
         #         plt.figure()
         #         plt.imshow(img[0, :, :], cmap="gray")
         #         plt.show()
+
 
 if __name__ == "__main__":
     main()
