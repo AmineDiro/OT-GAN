@@ -1,3 +1,5 @@
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1rFNs_dYyU_gTCL216TvN8WTFCRAlKmHR?usp=sharing)
+
 # Optimal Transport applied to GANs 
 
 Implementation of GAN variants that built on optimal transport, using a different approach than the Wasserstein-GAN paper, as proposed in the OT-Gan paper (you can also start using this variant of the same idea).
@@ -43,5 +45,5 @@ To run the training follow these steps :
     | -si                  | --sample_interval| Interval number for sampling image from generator and saving them | 1       |
     | --score / --no-score |              | Boolean args to get Inception score or not                        | True        | 
 
-**NOTE :** The Notebook `Results.ipynb` presents the main results from training on the CIFAR10 dataset. We plot the generated images from training, the loss of generator, critic and the inception score while training.
+**NOTE :** The Notebook `Results.ipynb`  presents the main results from training on the CIFAR10 dataset. We plot the generated images from training, the loss of generator, critic and the inception score while training. You can click on the **[Open In Colab]** to access the notebook on google collab.
 
