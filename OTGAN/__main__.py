@@ -31,7 +31,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '-si',
-        "--save_epoch",
+        "--sample_interval",
         type=int,
         default=1,
         metavar="N",

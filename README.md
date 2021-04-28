@@ -31,9 +31,10 @@ Project Organization
 To run the training follow these steps :
 1. Clone the repository and cd to the directory
     ```bash
-    git clone https://github.com/AmineDiro/OT-GAN.git & cd OT-GAN/
+    git clone https://github.com/AmineDiro/OT-GAN.git && cd OT-GAN/
     ```
-2. The training has different arguments , run  the command `python -m OTGAN -args`
+2. The training has different arguments , run  the command `python -m OTGAN` with the proper arguments : 
+    
     | Short                | Long         | Description                                                       | Default |
     |----------------------|--------------|-------------------------------------------------------------------|---------|
     | -c                   | --channels   | Nb of channels 1 for MNIST,3 for CIFAR , 3 by default             | 3       |
