@@ -144,7 +144,6 @@ def train_and_evaluate(
                 noise = ((torch.rand([batch_size, ginput_dim]) * -2) + 1).to(device)
                 prime_noise = ((torch.rand([batch_size, ginput_dim]) * -2) + 1).to(device)
                 # Generated images :
-                # TODO : add require grad
                 gen_img = gmodel(noise)
                 gen_img_prime = gmodel(prime_noise)
 

@@ -33,7 +33,6 @@ class DoubleBatchDataset(data.Dataset):
 
 
 def load_CIFAR10(batch_size=64, img_size=32):
-    # TODO : Add transformatio normalize values in [-1,1]
     transform = transforms.Compose(
         [
             transforms.Resize(size=(32, 32)),
@@ -51,7 +50,6 @@ def load_CIFAR10(batch_size=64, img_size=32):
 
 
 def load_MNIST(batch_size=64, img_size=32):
-    # TODO : Add transformatio normalize values in [-1,1]
     transform = transforms.Compose(
         [
             transforms.Resize(size=(32, 32)),
@@ -67,27 +65,3 @@ def load_MNIST(batch_size=64, img_size=32):
     mnist = DoubleBatchDataset(trainset, trainset)
 
     return torch.utils.data.DataLoader(mnist, batch_size=batch_size, shuffle=True)
-
-
-# def load_mnist(batch_size=64, img_size=32, double_batch=True):
-#     """Download, preprocess and load MNIST data."""
-#     mnist = datasets.MNIST("data_mnist", train=True, download=True).data
-
-#     # Perform transformation directly on raw data rather than in the DataLoader
-#     # => avoids overhead of performing transforms at each batch call
-#     # => much faster epochs.
-#     pics = []
-#     for pic in mnist:
-#         pic = to_pil_image(pic)
-#         if img_size != 28:
-#             pic = resize(pic, img_size)  # Resize image if needed
-#         pic = to_tensor(pic)  # Tensor conversion normalizes in [0,1]
-#         pic = normalize(pic, [0.5], [0.5])  # Normalize values in [-1,1]
-#         pics.append(pic)
-
-#     mnist = torch.stack(pics)
-
-#     if double_batch:
-#         mnist = DoubleBatchDataset(mnist, mnist)
-
-#     return torch.utils.data.DataLoader(mnist, batch_size=batch_size, shuffle=True)

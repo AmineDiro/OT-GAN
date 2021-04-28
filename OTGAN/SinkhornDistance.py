@@ -26,9 +26,6 @@ def sinkhorn_dist_log(X, Y, epsilon=0.1, max_iter=100, thresh=1e-1):
     else:
         batch_size = X.shape[0]
 
-    # both marginals are fixed with equal weights
-    # NOTE: change mu nu from marginal to dirac weighted sum
-    # Maybe not ?
     mu = (
         torch.empty(batch_size, X_points, dtype=torch.float, requires_grad=False)
         .fill_(1.0 / X_points)
