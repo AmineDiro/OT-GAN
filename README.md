@@ -8,7 +8,7 @@ Implementation of GAN variants that built on optimal transport, using a differen
 
 # Usage
 
-To test training implementation of th GAN model with the Mini batch Energy distance loss presented in the paper you should clone the project. 
+To test training implementation of the GAN model with the Mini batch Energy distance loss presented in the paper you should clone the project. 
 
 
 Project Organization
