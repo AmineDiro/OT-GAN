@@ -34,14 +34,14 @@ To run the training follow these steps :
     git clone https://github.com/AmineDiro/OT-GAN.git && cd OT-GAN/
     ```
 2. The training has different arguments , run  the command `python -m OTGAN` with the proper arguments : 
-    
+
     | Short                | Long         | Description                                                       | Default |
     |----------------------|--------------|-------------------------------------------------------------------|---------|
     | -c                   | --channels   | Nb of channels 1 for MNIST,3 for CIFAR , 3 by default             | 3       |
     | -b                   | --batch_size | Batch size for training (default: 64)                             | 64      |
     | -se                  | --save_epoch | Saving model every N epoch                                        | 2       |
-    | -si                  | --save_epoch | Interval number for sampling image from generator and saving them | 1       |
-    | --score / --no-score |              | Boolean args to get Inception score or not                        |         |
+    | -si                  | --sample_interval| Interval number for sampling image from generator and saving them | 1       |
+    | --score / --no-score |              | Boolean args to get Inception score or not                        | True        | 
 
 **NOTE :** The Notebook `Results.ipynb` presents the main results from training on the CIFAR10 dataset. We plot the generated images from training, the loss of generator, critic and the inception score while training.
 
