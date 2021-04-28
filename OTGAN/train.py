@@ -1,6 +1,7 @@
 import os
 import glob
 import argparse
+import pickle
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -20,20 +21,23 @@ from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tqdm import tqdm
 
-from SinkhornDistance import loss_func
-from dataset import load_MNIST, load_CIFAR10
-from Generator import Generator
-from Discriminator import Discriminator
-from torchvision.models.inception import inception_v3
-from InceptionScore import inception_score_training
+from OTGAN.SinkhornDistance import loss_func
+from OTGAN.dataset import load_MNIST, load_CIFAR10
+from OTGAN.Generator import Generator
+from OTGAN.Discriminator import Discriminator
 
-from utils import *
+from torchvision.models.inception import inception_v3
+from OTGAN.InceptionScore import inception_score_training
+
+from OTGAN.utils import *
 
 
 def train_and_evaluate(
     channels,
     batch_size,
     INCEPTION_SCORE,
+    save_epoch,
+    sample_interval,
     LOAD_MODEL=False,
     WEIGHT_INIT=False,
     use_cuda=True,
@@ -41,7 +45,7 @@ def train_and_evaluate(
     # Hyperparameter
     # batch_size = batch_size
     ginput_dim = 100
-    n_epochs = 100
+    n_epochs = 30
     lr = 3e-4
     beta1 = 0.5
     beta2 = 0.999
@@ -50,12 +54,20 @@ def train_and_evaluate(
     N_inception = 100  # Number of batches
     if channels == 1:
         output_path_imgs = "./generated_image_MNIST"
+        output_path_model = './model_MNIST'
+        if not os.path.exists(output_path_model):
+            os.makedirs(output_path_model)
+
     else:
         output_path_imgs = "./generated_image_CIFAR"
+        output_path_model = './model_CIFAR'
+        if not os.path.exists(output_path_model):
+            os.makedirs(output_path_model)
+    
     save_epoch = 2
     sample_interval = 1
 
-    ##SAve losses
+    ## Save losses
     G_loss = []
     D_loss = []
 
@@ -78,8 +90,8 @@ def train_and_evaluate(
     gmodel = Generator(out_channels=channels)
     dmodel = Discriminator(in_channel=channels)
 
-    # Load inception model,pretrained for the inception score
-    if INCEPTION_SCORE:
+    # Load inception model,pretrained for the inception score, no inception score for mnist
+    if INCEPTION_SCORE and channels != 1:
         print("Loading Inception model ...")
         inception_model = inception_v3(pretrained=True, transform_input=False).to(
             device
@@ -93,6 +105,7 @@ def train_and_evaluate(
 
     # Load last trained model
     if LOAD_MODEL:
+        print("Loading last saved model...")
         saved_weights_file = glob.glob("model/*")
         # Get latest saved weights
         model_path = max(saved_weights_file, key=os.path.getctime)
@@ -111,15 +124,18 @@ def train_and_evaluate(
     # Minus one variable used for gradient ascent of critic
     mone = -torch.tensor(1, dtype=torch.float).to(device)
 
+
     for epoch in range(n_epochs):
         desc = "[Epoch {}]".format(epoch)
         torch.cuda.empty_cache()
         #tbatch = tqdm(numerate(dataloader), desc=desc)
         total = len(dataloader)
+        G_epoch_loss , D_epoch_loss = 0, 0
+
         with tqdm(total=total, desc=desc) as tbatch:
             for i, (im1, im2) in enumerate(dataloader):
-                # if i ==102 :
-                #     break
+                if i ==102 :
+                    break
                 optimizer_D.zero_grad()
                 optimizer_G.zero_grad()
                 # Real images batch to GPU
@@ -140,9 +156,8 @@ def train_and_evaluate(
 
                 loss, loss_generator, loss_critic = loss_func(X, Xprime, Y, Yprime)
 
-                # Save losses
-                G_loss.append(loss_generator.detach().cpu().numpy())
-                D_loss.append(loss_generator.detach().cpu().numpy())
+                G_epoch_loss += loss_generator.detach().cpu().numpy()
+                D_epoch_loss += loss_critic.detach().cpu().numpy()
 
                 # Update critic once every "n_gen" generator updates
                 if i + 1 % n_gen == 0:
@@ -161,8 +176,13 @@ def train_and_evaluate(
                     loss_generator=loss_generator.item(), loss_critic=loss_critic.item()
                 )
                 tbatch.update(1)
+        
+        # Save losses
+        G_loss.append(G_epoch_loss)
+        D_loss.append(D_epoch_loss)
 
-        if INCEPTION_SCORE:
+
+        if INCEPTION_SCORE and channels != 1 :
             score = inception_score_training(
                 imgs,
                 inception_model,
@@ -188,6 +208,7 @@ def train_and_evaluate(
 
 
         if epoch % save_epoch == 0:
+            # Save interval
             torch.save(
                 {
                     "generator": gmodel.state_dict(),
@@ -195,34 +216,10 @@ def train_and_evaluate(
                     "optimizer_G": optimizer_G.state_dict(),
                     "optimizerD": optimizer_D.state_dict(),
                 },
-                "model/model_mnist.pth",
+                os.path.join(output_path_model, "model_{}.pth".format(batch_size)),
             )
+            # save losses and icp score
+            with open('results/pickled_result_{}.pkl'.format(batch_size),'wb') as f :
+                pickle.dump( (icp, (G_loss, D_loss)), f )
+ 
 
-    return icp, (G_loss, D_loss)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Hyperparams")
-    parser.add_argument(
-        "--channels",
-        type=int,
-        default=3,
-        metavar="N",
-        help="1 for MNIST  ; 3 for CIFAR , 3 by default",
-    )
-    parser.add_argument(
-        "--batch_size",
-        type=int,
-        default=64,
-        metavar="N",
-        help="Batch size for training and validation(default: 64)",
-    )
-
-    parser.add_argument("--score", dest="score", action="store_true")
-    parser.add_argument("--no-score", dest="score", action="store_false")
-    parser.set_defaults(score=True)
-    args = parser.parse_args()
-
-    icp, (G_loss, D_loss) = train_and_evaluate(
-        channels=args.channels, batch_size=args.batch_size, INCEPTION_SCORE=args.score
-    )

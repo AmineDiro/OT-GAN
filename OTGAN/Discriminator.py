@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 import torch.nn.functional as F
-from weight_norm import weight_norm
 
 class Discriminator(nn.Module):
     def __init__(self, in_channel =3,kernel_size=5):

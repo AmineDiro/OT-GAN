@@ -4,46 +4,6 @@ import torch.nn as nn
 from torch import Tensor
 import torch.nn.functional as F
 
-# Weight initialisation
-from weight_norm import weight_norm
-
-# class Generator(nn.Module):
-#     """Generator architecture from Salimans et al (2018) [see appendix B]."""
-#     def __init__(self,out_channels =3, input_size=100, kernel_size=5):
-#         super(Generator, self).__init__()
-
-#         self.linear = nn.Linear(input_size, 2*512*8*8)
-#         self.upsample = nn.Upsample(scale_factor=2, mode='nearest')
-
-#         conv_padding_size = (kernel_size - 1) // 2
-
-#         self.conv1 = nn.Conv2d(512, 2*256, kernel_size, padding=conv_padding_size)
-#         self.conv2 = nn.Conv2d(256, 2*128, kernel_size, padding=conv_padding_size)
-#         self.conv3 = nn.Conv2d(128, out_channels, kernel_size, padding=conv_padding_size)
-
-#         self.activ_out = nn.Tanh()
-
-#     def forward(self, x):
-
-#         x = self.linear(x) # Shape : (n_batch, 65536)
-#         # GLU activation function
-#         x, l = torch.split(x, x.shape[1]//2, 1)
-#         x *= torch.sigmoid(l) # Shape : (n_batch, 32768)
-#         x = x.view((x.shape[0], 512, 8, 8)) # Shape : (n_batch, 512, 8, 8)
-
-#         x = self.upsample(x) # Shape : (n_batch, 512, 16, 16)
-#         x = self.conv1(x) # Shape : (n_batch, 512, 16, 16)
-#         x, l = torch.split(x, x.shape[1]//2, 1)
-#         x *= torch.sigmoid(l) # Shape : (n_batch, 256, 16, 16)
-
-#         x = self.upsample(x) # Shape : (n_batch, 256, 32, 32)
-#         x = self.conv2(x) # Shape : (n_batch, 256, 32, 32)
-#         x, l = torch.split(x, x.shape[1]//2, 1)
-#         x *= torch.sigmoid(l) # Shape : (n_batch, 128, 32, 32)
-
-#         x = self.activ_out(self.conv3(x)) # Shape : (n_batch, 1, 32, 32)
-
-#         return x # Shape : (batch_size, 1, 32, 32)
 
 class Generator(nn.Module):
     def __init__(self, input_dim=100, out_channels=3):

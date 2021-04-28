@@ -6,7 +6,8 @@ import torch.utils.data
 
 import numpy as np
 from scipy.stats import entropy
-from utils import *
+from OTGAN.utils import *
+from torchvision.models.inception import inception_v3
 
 
 def inception_score(imgs, cuda=False, batch_size=32, resize=False, splits=1):
@@ -37,7 +38,7 @@ def inception_score(imgs, cuda=False, batch_size=32, resize=False, splits=1):
     # Load inception model
     inception_model = inception_v3(pretrained=True, transform_input=False).to(device)
     inception_model.eval()
-    up = nn.Upsample(size=(299, 299), mode='bilinear').type(dtype)
+    up = nn.Upsample(size=(299, 299), mode='bilinear',align_corners=False ).to(device)
     def get_pred(x):
         if resize:
             x = up(x)
@@ -103,49 +104,3 @@ def inception_score_training(imgs,inception_model, gmodel, batch_size=32, N =100
         split_scores.append(np.exp(np.mean(scores)))
 
     return np.mean(split_scores) #, np.std(split_scores)
-
-
-
-
-# if __name__ == '__main__':
-#     class IgnoreLabelDataset(torch.utils.data.Dataset):
-#         def __init__(self, orig):
-#             self.orig = orig
-
-#         def __getitem__(self, index):
-#             return self.orig[index][0]
-
-#         def __len__(self):
-#             return len(self.orig)
-
-#     import torchvision.datasets as dset
-#     import torchvision.transforms as transforms
-
-
-#     '''
-#     cifar = dset.CIFAR10(root='data/', download=True,
-#                              transform=transforms.Compose([
-#                                  transforms.Scale(32),
-#                                  transforms.ToTensor(),
-#                                  transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-#                              ])
-#     )
-
-#     IgnoreLabelDataset(cifar)
-#     '''
-#     #data_dir = 'Imagenet'
-#     #dataset = 'cifar'
-#     batch_size = 128
-#     #train_loader = data_loader.fetch_dataloader(data_dir, batch_size, dataset)
-
-#     train_transformer = transforms.Compose([
-#             transforms.Resize((64,64)),        # resize the image to 64x64 (remove if images are already 64x64)
-#             transforms.RandomHorizontalFlip(),   # randomly flip image horizontally
-#             transforms.ToTensor(),
-#             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])  # transform it into a torch tensor
-
-
-#     print ("Calculating Inception Score...")
-#     #print (inception_score(data_loader.ImagenetDataset(data_dir, train_transformer), cuda=False, batch_size=32, resize=True, splits=10))
-#     #print (inception_score(data_loader.ChairsDataset('clean_chairs', train_transformer), cuda=False, batch_size=32, resize=True, splits=10))
-#     print (inception_score(data_loader.ChairsDataset('clean_chairs', train_transformer), cuda=False, batch_size=32, resize=True, splits=10))

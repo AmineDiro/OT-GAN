@@ -42,7 +42,7 @@ def load_CIFAR10(batch_size=64, img_size=32):
         ]
     )
     trainset = torchvision.datasets.CIFAR10(
-        root="./data_CIFAR10", train=True, download=False, transform=transform
+        root="./data_CIFAR10", train=True, download=True, transform=transform
     )
 
     cifar10 = DoubleBatchDataset(trainset, trainset)
@@ -61,7 +61,7 @@ def load_MNIST(batch_size=64, img_size=32):
     )
 
     trainset = torchvision.datasets.MNIST(
-        root="./data_mnist", train=True, download=False, transform=transform
+        root="./data_mnist", train=True, download=True, transform=transform
     )
 
     mnist = DoubleBatchDataset(trainset, trainset)
